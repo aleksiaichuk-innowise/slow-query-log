@@ -1,0 +1,76 @@
+2026-07-15 07:08:52.475 GMT [28] db=,user=,app=,client= LOG:  checkpoint starting: time
+2026-07-15 07:08:54.042 GMT [28] db=,user=,app=,client= LOG:  checkpoint complete: wrote 16 buffers (0.1%); 0 WAL file(s) added, 2 removed, 0 recycled; write=1.519 s, sync=0.014 s, total=1.567 s; sync files=17, longest=0.009 s, average=0.001 s; distance=32101 kB, estimate=32101 kB; lsn=0/39179AB0, redo lsn=0/39179A78
+2026-07-15 07:12:39.771 GMT [54] db=workshop,user=workshop,app=psql,client=[local] LOG:  duration: 267.777 ms  plan:
+	Query Text: SELECT * FROM orders 
+	WHERE customer_email = 'user25000@example.com' 
+	  AND status = 'paid';
+	Seq Scan on public.orders  (cost=0.00..123942.00 rows=25 width=45) (actual time=44.944..267.567 rows=33 loops=1)
+	  Output: id, customer_email, amount, status, created_at
+	  Filter: ((orders.customer_email = 'user25000@example.com'::text) AND (orders.status = 'paid'::text))
+	  Rows Removed by Filter: 4999967
+	  Buffers: shared hit=778 read=48164
+	Query Identifier: -1583104993329840726
+	JIT:
+	  Functions: 2
+	  Options: Inlining false, Optimization false, Expressions true, Deforming true
+	  Timing: Generation 0.483 ms, Inlining 0.000 ms, Optimization 0.486 ms, Emission 5.039 ms, Total 6.008 ms
+2026-07-15 07:12:39.772 GMT [54] db=workshop,user=workshop,app=psql,client=[local] LOG:  duration: 269.274 ms  statement: SELECT * FROM orders 
+	WHERE customer_email = 'user25000@example.com' 
+	  AND status = 'paid';
+2026-07-15 07:13:20.937 GMT [54] db=workshop,user=workshop,app=psql,client=[local] LOG:  duration: 6290.890 ms  statement: CREATE INDEX idx_orders_email_status ON orders(customer_email, status);
+2026-07-15 07:13:40.263 GMT [54] db=workshop,user=workshop,app=psql,client=[local] LOG:  duration: 5305.868 ms  statement: CREATE INDEX idx_orders_customer_email ON orders(customer_email);
+2026-07-15 07:13:52.096 GMT [28] db=,user=,app=,client= LOG:  checkpoint starting: time
+2026-07-15 07:13:53.870 GMT [28] db=,user=,app=,client= LOG:  checkpoint complete: wrote 18 buffers (0.1%); 0 WAL file(s) added, 4 removed, 0 recycled; write=1.721 s, sync=0.012 s, total=1.775 s; sync files=17, longest=0.008 s, average=0.001 s; distance=71623 kB, estimate=71623 kB; lsn=0/3D76B890, redo lsn=0/3D76B858
+2026-07-15 07:29:22.699 GMT [54] db=workshop,user=workshop,app=psql,client=[local] LOG:  duration: 13516.720 ms  plan:
+	Query Text: SELECT c.email, COUNT(o.id) as order_count, SUM(o.amount) as total_spent
+	FROM customers c
+	JOIN orders o ON c.email = o.customer_email
+	GROUP BY c.email
+	ORDER BY total_spent DESC
+	LIMIT 100;
+	Limit  (cost=417177.96..417178.21 rows=100 width=61) (actual time=13516.649..13516.665 rows=100 loops=1)
+	  Output: c.email, (count(o.id)), (sum(o.amount))
+	  Buffers: shared hit=1651207 read=3348477 written=3
+	  ->  Sort  (cost=417177.96..417302.96 rows=50000 width=61) (actual time=13499.618..13499.626 rows=100 loops=1)
+	        Output: c.email, (count(o.id)), (sum(o.amount))
+	        Sort Key: (sum(o.amount)) DESC
+	        Sort Method: top-N heapsort  Memory: 36kB
+	        Buffers: shared hit=1651207 read=3348477 written=3
+	        ->  GroupAggregate  (cost=4820.09..415267.00 rows=50000 width=61) (actual time=123.600..13485.367 rows=50000 loops=1)
+	              Output: c.email, count(o.id), sum(o.amount)
+	              Group Key: c.email
+	              Buffers: shared hit=1651207 read=3348477 written=3
+	              ->  Merge Join  (cost=4820.09..377528.72 rows=4948437 width=31) (actual time=122.827..13059.510 rows=5000000 loops=1)
+	                    Output: c.email, o.id, o.amount
+	                    Merge Cond: (o.customer_email = c.email)
+	                    Buffers: shared hit=1651207 read=3348477 written=3
+	                    ->  Index Scan using idx_orders_customer_email on public.orders o  (cost=0.43..288744.37 rows=5000000 width=31) (actual time=0.202..11949.849 rows=5000000 loops=1)
+	                          Output: o.id, o.customer_email, o.amount, o.status, o.created_at
+	                          Buffers: shared hit=1651207 read=3348061 written=3
+	                    ->  Sort  (cost=4818.41..4943.41 rows=50000 width=21) (actual time=122.498..294.920 rows=4999903 loops=1)
+	                          Output: c.email
+	                          Sort Key: c.email
+	                          Sort Method: quicksort  Memory: 3099kB
+	                          Buffers: shared read=416
+	                          ->  Seq Scan on public.customers c  (cost=0.00..916.00 rows=50000 width=21) (actual time=0.115..18.749 rows=50000 loops=1)
+	                                Output: c.email
+	                                Buffers: shared read=416
+	Query Identifier: 1681154600422183918
+	JIT:
+	  Functions: 13
+	  Options: Inlining false, Optimization false, Expressions true, Deforming true
+	  Timing: Generation 0.835 ms, Inlining 0.000 ms, Optimization 0.538 ms, Emission 16.564 ms, Total 17.937 ms
+2026-07-15 07:29:22.699 GMT [54] db=workshop,user=workshop,app=psql,client=[local] LOG:  duration: 13521.191 ms  statement: SELECT c.email, COUNT(o.id) as order_count, SUM(o.amount) as total_spent
+	FROM customers c
+	JOIN orders o ON c.email = o.customer_email
+	GROUP BY c.email
+	ORDER BY total_spent DESC
+	LIMIT 100;
+2026-07-15 07:39:15.053 GMT [1] db=,user=,app=,client= LOG:  received fast shutdown request
+2026-07-15 07:39:15.059 GMT [1] db=,user=,app=,client= LOG:  aborting any active transactions
+2026-07-15 07:39:15.060 GMT [69] db=workshop,user=workshop,app=psql,client=[local] FATAL:  terminating connection due to administrator command
+2026-07-15 07:39:15.062 GMT [1] db=,user=,app=,client= LOG:  background worker "logical replication launcher" (PID 33) exited with exit code 1
+2026-07-15 07:39:15.064 GMT [28] db=,user=,app=,client= LOG:  shutting down
+2026-07-15 07:39:15.068 GMT [28] db=,user=,app=,client= LOG:  checkpoint starting: shutdown immediate
+2026-07-15 07:39:15.081 GMT [28] db=,user=,app=,client= LOG:  checkpoint complete: wrote 0 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.001 s, total=0.017 s; sync files=3, longest=0.001 s, average=0.001 s; distance=0 kB, estimate=64461 kB; lsn=0/3D76B940, redo lsn=0/3D76B940
+2026-07-15 07:39:15.112 GMT [1] db=,user=,app=,client= LOG:  database system is shut down

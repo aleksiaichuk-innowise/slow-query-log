@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: pg-slowlog
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: workshop
+      POSTGRES_PASSWORD: workshop
+      POSTGRES_DB: workshop
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./conf/postgresql.conf:/etc/postgresql/postgresql.conf:ro
+      - ./init:/docker-entrypoint-initdb.d:ro
+      - pg_data:/var/lib/postgresql/data
+      - ./pg_logs:/var/log/postgresql   # ← bind mount в папку проекта
+    command: ["postgres", "-c", "config_file=/etc/postgresql/postgresql.conf"]
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin-slowlog
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@workshop.com
+      PGADMIN_DEFAULT_PASSWORD: workshop
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+    ports:
+      - "8080:80"
+    volumes:
+      - ./pg_logs:/var/lib/pgadmin/storage/admin_workshop.com/pg_logs
+
+volumes:
+  pg_data:
