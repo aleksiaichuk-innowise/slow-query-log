@@ -29,7 +29,7 @@ services:
       PGADMIN_DEFAULT_PASSWORD: workshop
       PGADMIN_CONFIG_SERVER_MODE: "False"
     ports:
-      - "8080:80"
+      - "8085:80"
     volumes:
       - ./pg_logs:/var/lib/pgadmin/storage/admin_workshop.com/pg_logs
 

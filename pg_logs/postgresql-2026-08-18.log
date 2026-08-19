@@ -1,0 +1,7 @@
+2026-08-18 12:10:59.269 GMT [1] db=,user=,app=,client= LOG:  received fast shutdown request
+2026-08-18 12:10:59.273 GMT [1] db=,user=,app=,client= LOG:  aborting any active transactions
+2026-08-18 12:10:59.275 GMT [1] db=,user=,app=,client= LOG:  background worker "logical replication launcher" (PID 71) exited with exit code 1
+2026-08-18 12:10:59.277 GMT [66] db=,user=,app=,client= LOG:  shutting down
+2026-08-18 12:10:59.280 GMT [66] db=,user=,app=,client= LOG:  checkpoint starting: shutdown immediate
+2026-08-18 12:10:59.298 GMT [66] db=,user=,app=,client= LOG:  checkpoint complete: wrote 1 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.001 s, sync=0.003 s, total=0.021 s; sync files=1, longest=0.003 s, average=0.003 s; distance=0 kB, estimate=132396 kB; lsn=0/411CD248, redo lsn=0/411CD248
+2026-08-18 12:10:59.324 GMT [1] db=,user=,app=,client= LOG:  database system is shut down

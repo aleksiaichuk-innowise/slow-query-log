@@ -1,0 +1,18 @@
+д2026-08-17 14:33:56.869 GMT [204] db=workshop,user=workshop,app=pgAdmin 4 - CONN:694705,client=172.21.0.3 LOG:  duration: 148.377 ms  plan:
+	Query Text: SELECT * FROM orders WHERE customer_email LIKE '%25000%';
+	Gather  (cost=1000.00..76034.67 rows=500 width=45) (actual time=13.140..148.206 rows=109 loops=1)
+	  Output: id, customer_email, amount, status, created_at
+	  Workers Planned: 2
+	  Workers Launched: 2
+	  Buffers: shared hit=173 read=48770
+	  ->  Parallel Seq Scan on public.orders  (cost=0.00..74984.67 rows=208 width=45) (actual time=8.657..144.021 rows=36 loops=3)
+	        Output: id, customer_email, amount, status, created_at
+	        Filter: (orders.customer_email ~~ '%25000%'::text)
+	        Rows Removed by Filter: 1666630
+	        Buffers: shared hit=173 read=48770
+	        Worker 0:  actual time=8.579..143.158 rows=31 loops=1
+	          Buffers: shared hit=41 read=15954
+	        Worker 1:  actual time=4.803..143.141 rows=36 loops=1
+	          Buffers: shared hit=47 read=15942
+	Query Identifier: 2827350113108556094
+2026-08-17 14:33:56.869 GMT [204] db=workshop,user=workshop,app=pgAdmin 4 - CONN:694705,client=172.21.0.3 LOG:  duration: 149.202 ms  statement: SELECT * FROM orders WHERE customer_email LIKE '%25000%';

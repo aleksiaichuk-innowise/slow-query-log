@@ -1,0 +1,100 @@
+2026-08-17 13:52:33.164 GMT [48] db=,user=,app=,client= LOG:  starting PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+2026-08-17 13:52:33.169 GMT [48] db=,user=,app=,client= LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-08-17 13:52:33.178 GMT [52] db=,user=,app=,client= LOG:  database system was shut down at 2026-08-17 13:52:32 GMT
+2026-08-17 13:52:33.185 GMT [48] db=,user=,app=,client= LOG:  database system is ready to accept connections
+2026-08-17 13:52:43.147 GMT [50] db=,user=,app=,client= LOG:  checkpoints are occurring too frequently (10 seconds apart)
+2026-08-17 13:52:43.147 GMT [50] db=,user=,app=,client= HINT:  Consider increasing the configuration parameter "max_wal_size".
+2026-08-17 13:52:43.189 GMT [50] db=,user=,app=,client= LOG:  checkpoint starting: wal
+2026-08-17 13:52:48.920 GMT [62] db=workshop,user=workshop,app=psql,client=[local] LOG:  duration: 15216.837 ms  plan:
+	Query Text: INSERT INTO orders (customer_email, amount, status, created_at)
+	SELECT
+	    'user' || (1 + floor(random() * 50000))::int || '@example.com',
+	    round((random() * 1000)::numeric, 2),
+	    (ARRAY['new','paid','shipped','cancelled'])[1 + floor(random() * 4)],
+	    now() - (random() * interval '365 days')
+	FROM generate_series(1, 5000000) AS i;
+	Insert on public.orders  (cost=0.00..375000.00 rows=0 width=0) (actual time=15216.834..15216.836 rows=0 loops=1)
+	  Buffers: shared hit=15326836 read=1 dirtied=62669 written=104490, temp read=8545 written=8545
+	  ->  Subquery Scan on "*SELECT*"  (cost=0.00..375000.00 rows=5000000 width=92) (actual time=228.777..6456.274 rows=5000000 loops=1)
+	        Output: nextval('orders_id_seq'::regclass), "*SELECT*"."?column?", "*SELECT*".round, "*SELECT*"."array", "*SELECT*"."?column?_1"
+	        Buffers: shared hit=5000011 dirtied=1, temp read=8545 written=8545
+	        ->  Function Scan on pg_catalog.generate_series i  (cost=0.00..325000.00 rows=5000000 width=104) (actual time=228.688..4480.799 rows=5000000 loops=1)
+	              Output: (('user'::text || ((('1'::double precision + floor((random() * '50000'::double precision))))::integer)::text) || '@example.com'::text), round(((random() * '1000'::double precision))::numeric, 2), ('{new,paid,shipped,cancelled}'::text[])[('1'::double precision + floor((random() * '4'::double precision)))], (now() - (random() * '365 days'::interval))
+	              Function Call: generate_series(1, 5000000)
+	              Buffers: temp read=8545 written=8545
+	Query Identifier: -3802805076470907219
+	JIT:
+	  Functions: 4
+	  Options: Inlining false, Optimization false, Expressions true, Deforming true
+	  Timing: Generation 0.275 ms, Inlining 0.000 ms, Optimization 0.156 ms, Emission 2.942 ms, Total 3.372 ms
+2026-08-17 13:52:48.949 GMT [62] db=workshop,user=workshop,app=psql,client=[local] LOG:  duration: 15277.008 ms  statement: INSERT INTO orders (customer_email, amount, status, created_at)
+	SELECT
+	    'user' || (1 + floor(random() * 50000))::int || '@example.com',
+	    round((random() * 1000)::numeric, 2),
+	    (ARRAY['new','paid','shipped','cancelled'])[1 + floor(random() * 4)],
+	    now() - (random() * interval '365 days')
+	FROM generate_series(1, 5000000) AS i;
+2026-08-17 13:52:49.271 GMT [62] db=workshop,user=workshop,app=psql,client=[local] LOG:  duration: 256.152 ms  statement: ANALYZE orders;
+2026-08-17 13:52:49.274 GMT [48] db=,user=,app=,client= LOG:  received fast shutdown request
+2026-08-17 13:52:49.276 GMT [48] db=,user=,app=,client= LOG:  aborting any active transactions
+2026-08-17 13:52:49.278 GMT [48] db=,user=,app=,client= LOG:  background worker "logical replication launcher" (PID 55) exited with exit code 1
+2026-08-17 13:52:50.888 GMT [50] db=,user=,app=,client= LOG:  checkpoint complete: wrote 68 buffers (0.4%); 0 WAL file(s) added, 0 removed, 33 recycled; write=6.082 s, sync=1.514 s, total=7.741 s; sync files=313, longest=0.462 s, average=0.005 s; distance=539701 kB, estimate=539701 kB; lsn=0/36ECF888, redo lsn=0/224000A8
+2026-08-17 13:52:50.888 GMT [50] db=,user=,app=,client= LOG:  shutting down
+2026-08-17 13:52:50.891 GMT [50] db=,user=,app=,client= LOG:  checkpoint starting: shutdown immediate
+2026-08-17 13:52:51.163 GMT [50] db=,user=,app=,client= LOG:  checkpoint complete: wrote 16286 buffers (99.4%); 0 WAL file(s) added, 0 removed, 20 recycled; write=0.106 s, sync=0.104 s, total=0.276 s; sync files=11, longest=0.101 s, average=0.010 s; distance=338750 kB, estimate=519606 kB; lsn=0/36ECF900, redo lsn=0/36ECF900
+2026-08-17 13:52:51.184 GMT [48] db=,user=,app=,client= LOG:  database system is shut down
+2026-08-17 13:52:51.232 GMT [1] db=,user=,app=,client= LOG:  starting PostgreSQL 16.15 (Debian 16.15-1.pgdg13+2) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+2026-08-17 13:52:51.232 GMT [1] db=,user=,app=,client= LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2026-08-17 13:52:51.232 GMT [1] db=,user=,app=,client= LOG:  listening on IPv6 address "::", port 5432
+2026-08-17 13:52:51.240 GMT [1] db=,user=,app=,client= LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-08-17 13:52:51.250 GMT [68] db=,user=,app=,client= LOG:  database system was shut down at 2026-08-17 13:52:51 GMT
+2026-08-17 13:52:51.255 GMT [1] db=,user=,app=,client= LOG:  database system is ready to accept connections
+2026-08-17 13:57:51.725 GMT [66] db=,user=,app=,client= LOG:  checkpoint starting: time
+2026-08-17 13:58:00.757 GMT [66] db=,user=,app=,client= LOG:  checkpoint complete: wrote 92 buffers (0.6%); 0 WAL file(s) added, 1 removed, 0 recycled; write=8.995 s, sync=0.019 s, total=9.033 s; sync files=23, longest=0.011 s, average=0.001 s; distance=3398 kB, estimate=3398 kB; lsn=0/372214A0, redo lsn=0/37221468
+2026-08-17 14:03:17.141 GMT [76] db=workshop,user=workshop,app=pgAdmin 4 - DB:workshop,client=172.21.0.3 ERROR:  could not stat file "/var/log/postgresql/postgresql-2026-08-17.log": No such file or directory
+2026-08-17 14:03:17.141 GMT [76] db=workshop,user=workshop,app=pgAdmin 4 - DB:workshop,client=172.21.0.3 STATEMENT:  /*pga4dash*/
+	SELECT pg_stat_file(pg_current_logfile());
+	
+2026-08-17 14:03:17.321 GMT [76] db=workshop,user=workshop,app=pgAdmin 4 - DB:workshop,client=172.21.0.3 ERROR:  could not stat file "/var/log/postgresql/postgresql-2026-08-17.log": No such file or directory
+2026-08-17 14:03:17.321 GMT [76] db=workshop,user=workshop,app=pgAdmin 4 - DB:workshop,client=172.21.0.3 STATEMENT:  /*pga4dash*/
+	SELECT pg_stat_file(pg_current_logfile());
+	
+2026-08-17 14:03:27.435 GMT [76] db=workshop,user=workshop,app=pgAdmin 4 - DB:workshop,client=172.21.0.3 ERROR:  could not stat file "/var/log/postgresql/postgresql-2026-08-17.log": No such file or directory
+2026-08-17 14:03:27.435 GMT [76] db=workshop,user=workshop,app=pgAdmin 4 - DB:workshop,client=172.21.0.3 STATEMENT:  /*pga4dash*/
+	SELECT pg_stat_file(pg_current_logfile());
+	
+2026-08-17 14:04:44.450 GMT [106] db=workshop,user=workshop,app=pgAdmin 4 - CONN:1072724,client=172.21.0.3 ERROR:  ALTER SYSTEM cannot run inside a transaction block
+2026-08-17 14:04:44.450 GMT [106] db=workshop,user=workshop,app=pgAdmin 4 - CONN:1072724,client=172.21.0.3 STATEMENT:  SET max_parallel_workers_per_gather = 0;
+	
+	ALTER SYSTEM SET log_min_duration_statement = 100;
+	ALTER SYSTEM SET auto_explain.log_min_duration = 100;
+	SELECT pg_reload_conf();
+2026-08-17 14:06:18.388 GMT [1] db=,user=,app=,client= LOG:  received SIGHUP, reloading configuration files
+2026-08-17 14:06:18.390 GMT [1] db=,user=,app=,client= LOG:  parameter "log_min_duration_statement" changed to "100"
+2026-08-17 14:06:18.390 GMT [1] db=,user=,app=,client= LOG:  parameter "auto_explain.log_min_duration" changed to "100"
+2026-08-17 14:06:46.736 GMT [106] db=workshop,user=workshop,app=pgAdmin 4 - CONN:1072724,client=172.21.0.3 LOG:  duration: 338.036 ms  plan:
+	Query Text: SELECT * FROM orders WHERE customer_email LIKE '%25000%';
+	Seq Scan on public.orders  (cost=0.00..111443.00 rows=500 width=45) (actual time=16.763..337.714 rows=109 loops=1)
+	  Output: id, customer_email, amount, status, created_at
+	  Filter: (orders.customer_email ~~ '%25000%'::text)
+	  Rows Removed by Filter: 4999891
+	  Buffers: shared hit=32 read=48911
+	Query Identifier: 2827350113108556094
+	JIT:
+	  Functions: 2
+	  Options: Inlining false, Optimization false, Expressions true, Deforming true
+	  Timing: Generation 0.099 ms, Inlining 0.000 ms, Optimization 0.161 ms, Emission 2.256 ms, Total 2.516 ms
+2026-08-17 14:06:46.736 GMT [106] db=workshop,user=workshop,app=pgAdmin 4 - CONN:1072724,client=172.21.0.3 LOG:  duration: 361.408 ms  statement: SELECT * FROM orders WHERE customer_email LIKE '%25000%';
+2026-08-17 14:08:05.141 GMT [106] db=workshop,user=workshop,app=pgAdmin 4 - CONN:1072724,client=172.21.0.3 LOG:  duration: 339.114 ms  plan:
+	Query Text: SELECT * FROM orders WHERE customer_email LIKE '%25000%';
+	Seq Scan on public.orders  (cost=0.00..111443.00 rows=500 width=45) (actual time=14.957..338.869 rows=109 loops=1)
+	  Output: id, customer_email, amount, status, created_at
+	  Filter: (orders.customer_email ~~ '%25000%'::text)
+	  Rows Removed by Filter: 4999891
+	  Buffers: shared hit=64 read=48879
+	Query Identifier: 2827350113108556094
+	JIT:
+	  Functions: 2
+	  Options: Inlining false, Optimization false, Expressions true, Deforming true
+	  Timing: Generation 0.128 ms, Inlining 0.000 ms, Optimization 0.133 ms, Emission 1.264 ms, Total 1.524 ms
+2026-08-17 14:08:05.141 GMT [106] db=workshop,user=workshop,app=pgAdmin 4 - CONN:1072724,client=172.21.0.3 LOG:  duration: 339.607 ms  statement: SELECT * FROM orders WHERE customer_email LIKE '%25000%';
